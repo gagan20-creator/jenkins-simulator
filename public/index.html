@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jenkins Simulator Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>🚀 Jenkins Simulator Dashboard</h1>
+    <p class="subtitle">CI/CD Queue • Worker Monitoring • Build Logs</p>
+
+    <!-- Worker Status -->
+    <section class="card">
+      <h2>👷 Worker Status</h2>
+      <div id="workers">
+        Loading workers...
+      </div>
+    </section>
+
+    <!-- Job Queue -->
+    <section class="card">
+      <h2>📦 Job Queue</h2>
+      <button onclick="loadJobs()">Refresh Jobs</button>
+      <div id="jobs">
+        Loading jobs...
+      </div>
+    </section>
+
+    <!-- Job Logs -->
+    <section class="card">
+      <h2>📝 Job Logs</h2>
+      <input
+        type="number"
+        id="jobId"
+        placeholder="Enter Job ID"
+      />
+      <button onclick="loadLogs()">View Logs</button>
+      <pre id="logs">Logs will appear here...</pre>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -4,34 +4,22 @@
 // ============================================================
 
 require('dotenv').config();
-const express    = require('express');
-const pool       = require('./db');
-const { startScheduler }    = require('./scheduler');
-const { getWorkerStatus }   = require('./workers');
+const express = require('express');
+const pool = require('./db');
+const { startScheduler } = require('./scheduler');
+const { getWorkerStatus } = require('./workers');
 
-const app  = express();
+const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.static('public'));
 
 // ── Pretty JSON responses ──────────────────────────────────
 app.set('json spaces', 2);
 
 // ── Health check ───────────────────────────────────────────
-app.get('/', (req, res) => {
-  res.json({
-    message : '🚀 Jenkins Simulator is running!',
-    endpoints: {
-      'POST /webhook'      : 'Simulate a GitHub push webhook',
-      'GET  /jobs'         : 'List all jobs',
-      'GET  /jobs/:id'     : 'Get a specific job with logs',
-      'GET  /jobs/status/:s': 'Filter jobs by status',
-      'GET  /workers'      : 'See worker status',
-      'POST /simulate'     : 'Simulate random job arrivals',
-      'DELETE /jobs/clear' : 'Clear all jobs',
-    }
-  });
-});
+
 
 // ── WEBHOOK ENDPOINT ───────────────────────────────────────
 // This is what GitHub would call on a code push
@@ -40,8 +28,8 @@ app.post('/webhook', async (req, res) => {
     const body = req.body;
 
     // Support real GitHub webhooks OR our simulated ones
-    const repo     = body.repository?.full_name || body.repo   || 'unknown/repo';
-    const branch   = body.ref?.replace('refs/heads/', '') || body.branch || 'main';
+    const repo = body.repository?.full_name || body.repo || 'unknown/repo';
+    const branch = body.ref?.replace('refs/heads/', '') || body.branch || 'main';
     const language = body.language || detectLanguage(repo);
 
     console.log(`\n[Webhook] Push received → ${repo} (${branch}) [${language}]`);
@@ -57,12 +45,12 @@ app.post('/webhook', async (req, res) => {
     console.log(`[Webhook] Job #${job.id} added to queue`);
 
     res.status(201).json({
-      message : 'Job queued successfully',
-      job_id  : job.id,
+      message: 'Job queued successfully',
+      job_id: job.id,
       repo,
       branch,
       language,
-      status  : 'queued',
+      status: 'queued',
     });
 
   } catch (err) {
@@ -128,14 +116,14 @@ app.delete('/jobs/clear', async (req, res) => {
 app.post('/simulate', async (req, res) => {
   const count = parseInt(req.body.count) || 5;
   const repos = [
-    { repo: 'company/backend-api',    language: 'python'     },
-    { repo: 'company/frontend-app',   language: 'javascript' },
-    { repo: 'company/auth-service',   language: 'java'       },
-    { repo: 'company/data-pipeline',  language: 'python'     },
-    { repo: 'company/mobile-app',     language: 'javascript' },
-    { repo: 'company/infra-scripts',  language: 'general'    },
-    { repo: 'company/payment-svc',    language: 'java'       },
-    { repo: 'company/notification-svc',language: 'node'      },
+    { repo: 'company/backend-api', language: 'python' },
+    { repo: 'company/frontend-app', language: 'javascript' },
+    { repo: 'company/auth-service', language: 'java' },
+    { repo: 'company/data-pipeline', language: 'python' },
+    { repo: 'company/mobile-app', language: 'javascript' },
+    { repo: 'company/infra-scripts', language: 'general' },
+    { repo: 'company/payment-svc', language: 'java' },
+    { repo: 'company/notification-svc', language: 'node' },
   ];
 
   const created = [];
@@ -144,7 +132,7 @@ app.post('/simulate', async (req, res) => {
     // Random delay between arrivals (0 – 3 seconds) to simulate real traffic
     await sleep(Math.random() * 3000);
 
-    const pick   = repos[Math.floor(Math.random() * repos.length)];
+    const pick = repos[Math.floor(Math.random() * repos.length)];
     const branch = randomBranch();
 
     const result = await pool.query(
@@ -164,7 +152,7 @@ app.post('/simulate', async (req, res) => {
 function detectLanguage(repo) {
   const r = repo.toLowerCase();
   if (r.includes('python') || r.includes('django') || r.includes('flask')) return 'python';
-  if (r.includes('java') || r.includes('spring'))  return 'java';
+  if (r.includes('java') || r.includes('spring')) return 'java';
   if (r.includes('node') || r.includes('express')) return 'node';
   if (r.includes('react') || r.includes('vue') || r.includes('frontend')) return 'javascript';
   return 'general';
