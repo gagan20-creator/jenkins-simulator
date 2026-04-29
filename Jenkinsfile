@@ -1,75 +1,80 @@
 pipeline {
     agent any
 
-    environment {
-        PROJECT_NAME = "Jenkins Simulator"
-    }
-
     stages {
 
-        stage('GitHub Webhook Trigger') {
+        stage('Webhook Trigger') {
             steps {
-                echo 'Push event received from GitHub webhook'
-                echo 'Starting CI/CD pipeline...'
+                echo 'GitHub push received'
+                echo 'Starting Jenkins Simulator pipeline'
+            }
+        }
+
+        stage('Branch Priority Check') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == "main") {
+                        echo 'Priority 1 → Main branch (Highest Priority)'
+                    } else if (env.BRANCH_NAME == "develop") {
+                        echo 'Priority 2 → Develop branch'
+                    } else {
+                        echo "Lower Priority Branch → ${env.BRANCH_NAME}"
+                    }
+                }
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building project...'
-                echo 'Installing Node.js dependencies'
+                echo 'Installing dependencies'
                 sh 'npm install'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running project tests...'
-                echo 'Checking server execution'
+                echo 'Running server check'
                 sh 'node server.js || true'
             }
         }
 
         stage('Database Check') {
             steps {
-                echo 'Checking PostgreSQL database connection...'
-                echo 'Verifying job queue table'
+                echo 'Checking PostgreSQL connection'
+                echo 'Verifying jobs table'
             }
         }
 
         stage('Worker Assignment') {
             steps {
-                echo 'Assigning available worker...'
-                echo 'Worker-Python / Worker-Node / Worker-Java / Worker-General'
+                echo 'Assigning worker based on language'
+                echo 'Python → Worker-Python'
+                echo 'Java → Worker-Java'
+                echo 'Node → Worker-Node'
+                echo 'Others → Worker-General'
             }
         }
 
-        stage('Deploy Simulation') {
+        stage('Deploy') {
             steps {
-                echo 'Deploying simulated pipeline execution...'
                 echo 'Updating dashboard and logs'
+                echo 'Marking job as completed'
             }
         }
 
-        stage('Success') {
-            steps {
-                echo 'Pipeline completed successfully!'
-                echo 'GitHub → Webhook → Jenkins → PostgreSQL → Worker → Dashboard'
-            }
-        }
     }
 
     post {
-        failure {
-            echo 'Build failed! Please check logs.'
+        success {
+            echo 'Pipeline completed successfully'
         }
 
-        success {
-            echo 'Build successful!'
+        failure {
+            echo 'Build failed'
         }
 
         always {
-            echo 'Pipeline execution finished.'
+            echo 'Pipeline finished'
         }
     }
 }
