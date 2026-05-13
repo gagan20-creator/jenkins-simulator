@@ -14,7 +14,7 @@ async function runScheduler() {
   try {
     // Fetch oldest queued job
     const result = await pool.query(
-      `SELECT * FROM jobs WHERE status='queued' ORDER BY created_at ASC LIMIT 1`
+      `SELECT * FROM jobs WHERE status='queued' ORDER BY effective_priority ASC, created_at ASC LIMIT 1`
     );
 
     if (result.rows.length === 0) {
@@ -53,6 +53,46 @@ async function runScheduler() {
 function startScheduler() {
   console.log('[Scheduler] Started — polling every 3 seconds');
   setInterval(runScheduler, 3000);
+  setInterval(promoteStarvingJobs, 10000);
 }
+async function promoteStarvingJobs() {
 
-module.exports = { startScheduler };
+  try {
+
+    const result = await pool.query(`
+      UPDATE jobs
+      SET effective_priority =
+          effective_priority - 1
+
+      WHERE status='queued'
+      AND effective_priority > 1
+
+      AND NOW() - created_at >
+          interval '2 minutes'
+
+      RETURNING id
+    `);
+
+    if (result.rows.length > 0) {
+
+      result.rows.forEach(job => {
+
+        console.log(
+          `[Starvation Prevention] Promoted Job #${job.id}`
+        );
+
+      });
+
+    }
+
+  } catch (err) {
+
+    console.error(
+      '[Starvation Prevention Error]',
+      err.message
+    );
+
+  }
+
+}
+module.exports = { startScheduler, promoteStarvingJobs };

@@ -2,7 +2,8 @@
 // SERVER.JS — Jenkins Master
 // Receives webhooks, manages jobs, exposes REST API
 // ============================================================
-
+const { calculatePriority } =
+require('./roleManager');
 require('dotenv').config();
 const express = require('express');
 const pool = require('./db');
@@ -31,6 +32,10 @@ app.post('/webhook', async (req, res) => {
     const repo = body.repository?.full_name || body.repo || 'unknown/repo';
     const branch = body.ref?.replace('refs/heads/', '') || body.branch || 'main';
     const language = body.language || detectLanguage(repo);
+    const role = body.role || 'intern';
+
+    const priority =
+      calculatePriority(role, branch); 
 
     console.log(`\n[Webhook] Push received → ${repo} (${branch}) [${language}]`);
 
@@ -136,9 +141,27 @@ app.post('/simulate', async (req, res) => {
     const branch = randomBranch();
 
     const result = await pool.query(
-      `INSERT INTO jobs (repo, branch, language, status)
-       VALUES ($1, $2, $3, 'queued') RETURNING id`,
-      [pick.repo, branch, pick.language]
+      `
+      INSERT INTO jobs (
+       repo,
+       branch,
+       language,
+       role,
+       priority,
+       effective_priority,
+       status
+   ) 
+      VALUES ($1,$2,$3,$4,$5,$6,'queued')
+       RETURNING *
+`,
+[
+  repo,
+  branch,
+  language,
+  role,
+  priority,
+  priority
+]
     );
 
     console.log(`[Simulate] Created job #${result.rows[0].id} → ${pick.repo} [${pick.language}]`);

@@ -36,6 +36,8 @@ async function loadJobs() {
           Branch: ${job.branch}<br>
           Language: ${job.language}<br>
           Status: <b>${job.status}</b><br>
+          Role: ${job.role || 'N/A'}<br>
+          Priority: ${job.priority || 'N/A'}<br>
           Worker: ${job.worker_name || 'Not assigned yet'}
         </div>
       `;
