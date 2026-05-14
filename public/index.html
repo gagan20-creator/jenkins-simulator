@@ -1,47 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Jenkins Simulator Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>🚀 Jenkins Simulator Dashboard</h1>
-    <p class="subtitle">CI/CD Queue • Worker Monitoring • Build Logs</p>
+<div class="container">
 
-    <!-- Worker Status -->
-    <section class="card">
-      <h2>👷 Worker Status</h2>
-      <div id="workers">
-        Loading workers...
-      </div>
-    </section>
+  <h1>🚀 Jenkins CI/CD Simulator</h1>
 
-    <!-- Job Queue -->
-    <section class="card">
-      <h2>📦 Job Queue</h2>
-      <button onclick="loadJobs()">Refresh Jobs</button>
-      <div id="jobs">
-        Loading jobs...
-      </div>
-    </section>
+  <p class="subtitle">
+    Smart Queue Scheduling • Live Workers • Pipeline Monitoring
+  </p>
 
-    <!-- Job Logs -->
-    <section class="card">
-      <h2>📝 Job Logs</h2>
-      <input
-        type="number"
-        id="jobId"
-        placeholder="Enter Job ID"
-      />
-      <button onclick="loadLogs()">View Logs</button>
-      <pre id="logs">Logs will appear here...</pre>
-    </section>
-  </div>
+  <!-- QUEUE LANES -->
+  <section class="card">
 
-  <script src="app.js"></script>
+    <h2>📦 Queue Lanes</h2>
+
+    <div class="lane q1">
+      <h3>Q1 — Admin</h3>
+      <div id="q1Jobs"></div>
+    </div>
+
+    <div class="lane q2">
+      <h3>Q2 — Team Lead</h3>
+      <div id="q2Jobs"></div>
+    </div>
+
+    <div class="lane q3">
+      <h3>Q3 — Developer</h3>
+      <div id="q3Jobs"></div>
+    </div>
+
+    <div class="lane q4">
+      <h3>Q4 — Employee</h3>
+      <div id="q4Jobs"></div>
+    </div>
+
+    <div class="lane q5">
+      <h3>Q5 — Intern</h3>
+      <div id="q5Jobs"></div>
+    </div>
+
+  </section>
+
+  <!-- ACTIVE JOBS -->
+  <section class="card">
+
+    <h2>⚡ Active Jobs — Stage Progress</h2>
+
+    <div id="activeJobs">
+      Loading active jobs...
+    </div>
+
+  </section>
+
+  <!-- WORKERS -->
+  <section class="card">
+
+    <h2>👷 Worker Status</h2>
+
+    <div id="workers">
+      Loading workers...
+    </div>
+
+  </section>
+
+  <!-- LOGS -->
+  <section class="card">
+
+    <h2>📝 Job Logs</h2>
+
+    <input
+      type="number"
+      id="jobId"
+      placeholder="Enter Job ID"
+    />
+
+    <button onclick="loadLogs()">
+      View Logs
+    </button>
+
+    <pre id="logs">
+Logs will appear here...
+    </pre>
+
+  </section>
+
+</div>
+
+<script src="app.js"></script>
+
 </body>
 </html>
