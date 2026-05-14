@@ -4,7 +4,7 @@
 // ============================================================
 
 const { calculatePriority } =
-require('./roleManager');
+  require('./roleManager');
 
 require('dotenv').config();
 
@@ -13,10 +13,10 @@ const express = require('express');
 const pool = require('./db');
 
 const { startScheduler } =
-require('./scheduler');
+  require('./scheduler');
 
 const { getWorkerStatus } =
-require('./workers');
+  require('./workers');
 
 const app = express();
 
@@ -115,7 +115,7 @@ app.post('/webhook', async (req, res) => {
     // ========================================================
 
     const result = await pool.query(
-`
+      `
 INSERT INTO jobs (
   repo,
   branch,
@@ -128,14 +128,14 @@ INSERT INTO jobs (
 VALUES ($1,$2,$3,$4,$5,$6,'queued')
 RETURNING *
 `,
-[
-  repo,
-  branch,
-  language,
-  role,
-  priority,
-  priority
-]
+      [
+        repo,
+        branch,
+        language,
+        role,
+        priority,
+        priority
+      ]
     );
 
     const job = result.rows[0];
@@ -188,7 +188,7 @@ app.get('/jobs', async (req, res) => {
   try {
 
     const result = await pool.query(
-`
+      `
 SELECT
   id,
   repo,
@@ -265,7 +265,7 @@ app.get('/jobs/status/:status', async (req, res) => {
   try {
 
     const result = await pool.query(
-`
+      `
 SELECT
   id,
   repo,
@@ -378,7 +378,7 @@ app.post('/simulate', async (req, res) => {
       randomBranch();
 
     const result = await pool.query(
-`
+      `
 INSERT INTO jobs (
   repo,
   branch,
@@ -391,14 +391,14 @@ INSERT INTO jobs (
 VALUES ($1,$2,$3,$4,$5,$6,'queued')
 RETURNING *
 `,
-[
-  pick.repo,
-  branch,
-  pick.language,
-  'developer',
-  3,
-  3
-]
+      [
+        pick.repo,
+        branch,
+        pick.language,
+        'developer',
+        3,
+        3
+      ]
     );
 
     console.log(
@@ -526,3 +526,5 @@ app.listen(PORT, () => {
   startScheduler();
 
 });
+// this is a comment
+
